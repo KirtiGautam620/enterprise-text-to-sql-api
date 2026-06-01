@@ -1,3 +1,4 @@
+from app.benchmark import run_benchmark
 from app.logger import log_event
 from app.database import execute_sql
 from app.validator import validate_sql
@@ -84,28 +85,6 @@ def generate_sql(request: GenerateSQLRequest):
         "execution_result": execution_result
     }
 
-
 @app.post("/benchmark", response_model=BenchmarkResponse)
 def benchmark():
-    return {
-        "total_queries": 0,
-        "metrics": {
-            "retrieval_recall_at_5": 0.0,
-            "sql_exact_match_accuracy": 0.0,
-            "sql_execution_match_accuracy": 0.0,
-            "parsing_success_rate": 0.0,
-            "average_latency_ms": 0.0
-        },
-        "subtask_breakdown": {
-            "multi_table_retrieval": 0.0,
-            "column_mapping": 0.0,
-            "join_detection": 0.0,
-            "domain_knowledge": 0.0
-        },
-        "error_analysis": {
-            "retrieval_failures": 0,
-            "parsing_failures": 0,
-            "execution_failures": 0,
-            "logic_errors": 0
-        }
-    }
+    return run_benchmark()
