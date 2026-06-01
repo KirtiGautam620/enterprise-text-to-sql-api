@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+sentence-transformers
+scikit-learn
+sqlparse
+requests

@@ -1,0 +1,50 @@
+[
+  {
+    "table_name": "departments",
+    "description": "Stores department information including department id, department name, school, and department code.",
+    "columns": [
+      {"name": "dept_id", "type": "INTEGER", "description": "Unique id of the department"},
+      {"name": "dept_name", "type": "TEXT", "description": "Name of the department"},
+      {"name": "school_name", "type": "TEXT", "description": "School or faculty this department belongs to"}
+    ]
+  },
+  {
+    "table_name": "students",
+    "description": "Stores student information including student id, name, department, and enrollment status.",
+    "columns": [
+      {"name": "student_id", "type": "INTEGER", "description": "Unique id of the student"},
+      {"name": "student_name", "type": "TEXT", "description": "Name of the student"},
+      {"name": "dept_id", "type": "INTEGER", "description": "Department id associated with the student"}
+    ]
+  },
+  {
+    "table_name": "enrollments",
+    "description": "Stores course enrollment records including students, courses, departments, and enrollment counts.",
+    "columns": [
+      {"name": "enrollment_id", "type": "INTEGER", "description": "Unique enrollment record id"},
+      {"name": "student_id", "type": "INTEGER", "description": "Student enrolled in a course"},
+      {"name": "course_id", "type": "INTEGER", "description": "Course in which student is enrolled"},
+      {"name": "dept_id", "type": "INTEGER", "description": "Department offering the enrollment"}
+    ]
+  },
+  {
+    "table_name": "courses",
+    "description": "Stores course information including course id, course name, department, online status, and credits.",
+    "columns": [
+      {"name": "course_id", "type": "INTEGER", "description": "Unique course id"},
+      {"name": "course_name", "type": "TEXT", "description": "Name of the course"},
+      {"name": "dept_id", "type": "INTEGER", "description": "Department that offers the course"},
+      {"name": "is_online", "type": "BOOLEAN", "description": "Whether the course is online or offline"}
+    ]
+  },
+  {
+    "table_name": "classrooms",
+    "description": "Stores classroom and room information including room id, building, capacity, and area.",
+    "columns": [
+      {"name": "room_id", "type": "INTEGER", "description": "Unique room id"},
+      {"name": "building_name", "type": "TEXT", "description": "Name of building"},
+      {"name": "capacity", "type": "INTEGER", "description": "Room capacity"},
+      {"name": "area", "type": "REAL", "description": "Room area"}
+    ]
+  }
+]

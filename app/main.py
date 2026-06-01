@@ -1,0 +1,82 @@
+from app.retrieval import retrieve_relevant_tables
+from fastapi import FastAPI, HTTPException
+from app.models import (
+    QuestionRequest,
+    RetrieveResponse,
+    GenerateSQLRequest,
+    GenerateSQLResponse,
+    BenchmarkResponse,
+)
+
+app = FastAPI(
+    title="Enterprise Text-to-SQL API",
+    description="A FastAPI microservice for semantic schema retrieval and SQL generation.",
+    version="0.1.0",
+)
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "Enterprise Text-to-SQL API is running",
+        "docs": "/docs"
+    }
+
+@app.post("/retrieve", response_model=RetrieveResponse)
+def retrieve_tables(request: QuestionRequest):
+    question = request.question.strip()
+
+    if not question:
+        raise HTTPException(status_code=400, detail="Question cannot be empty")
+
+    return retrieve_relevant_tables(question)
+
+@app.post("/generate-sql", response_model=GenerateSQLResponse)
+def generate_sql(request: GenerateSQLRequest):
+    question = request.question.strip()
+
+    if not question:
+        raise HTTPException(status_code=400, detail="Question cannot be empty")
+
+    dummy_sql = (
+        "SELECT d.dept_name, COUNT(e.student_id) AS total_students "
+        "FROM departments d "
+        "JOIN enrollments e ON d.dept_id = e.dept_id "
+        "GROUP BY d.dept_name "
+        "HAVING COUNT(e.student_id) > 100;"
+    )
+
+    return {
+        "sql": dummy_sql,
+        "retrieved_tables": ["departments", "enrollments"],
+        "is_valid_syntax": True,
+        "parsing_errors": None,
+        "confidence": 0.85,
+        "prompt_used": "Dummy prompt for initial API skeleton"
+    }
+
+
+@app.post("/benchmark", response_model=BenchmarkResponse)
+def benchmark():
+    return {
+        "total_queries": 0,
+        "metrics": {
+            "retrieval_recall_at_5": 0.0,
+            "sql_exact_match_accuracy": 0.0,
+            "sql_execution_match_accuracy": 0.0,
+            "parsing_success_rate": 0.0,
+            "average_latency_ms": 0.0
+        },
+        "subtask_breakdown": {
+            "multi_table_retrieval": 0.0,
+            "column_mapping": 0.0,
+            "join_detection": 0.0,
+            "domain_knowledge": 0.0
+        },
+        "error_analysis": {
+            "retrieval_failures": 0,
+            "parsing_failures": 0,
+            "execution_failures": 0,
+            "logic_errors": 0
+        }
+    }
