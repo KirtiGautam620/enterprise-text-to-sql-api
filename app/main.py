@@ -1,3 +1,4 @@
+from app.logger import log_event
 from app.database import execute_sql
 from app.validator import validate_sql
 from app.llm import build_sql_prompt, call_llm
@@ -44,13 +45,29 @@ def generate_sql(request: GenerateSQLRequest):
 
     retrieval_result = retrieve_relevant_tables(question)
     prompt = build_sql_prompt(question, retrieval_result)
+    log_event("prompt_created", {
+    "question": question,
+    "retrieved_tables": retrieval_result["retrieved_tables"],
+    "prompt": prompt
+})
     llm_result = call_llm(prompt)
+    log_event("llm_response", {
+    "success": llm_result["success"],
+    "raw_response": llm_result.get("raw_response"),
+    "sql": llm_result.get("sql"),
+    "error": llm_result.get("error")
+})
     validation_result = validate_sql(llm_result["sql"])
     execution_result = None
 
     if validation_result["is_valid"]:
         execution_result = execute_sql(llm_result["sql"])
 
+    log_event("sql_execution", {
+        "sql": llm_result["sql"],
+        "validation": validation_result,
+        "execution_result": execution_result
+    })   
     if not llm_result["success"]:
         raise HTTPException(
             status_code=500,
