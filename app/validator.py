@@ -44,6 +44,15 @@ def validate_sql(sql: str) -> Dict[str, Any]:
                     "is_valid": False,
                     "error": f"Unsafe SQL keyword detected: {keyword}"
                 }
+        suspicious_endings = ["ORDER BY", "GROUP BY", "WHERE", "JOIN", "ON", "AND", "OR", ","]
+        stripped_upper = upper_sql.strip().rstrip(";")
+
+        for ending in suspicious_endings:
+            if stripped_upper.endswith(ending):
+                return {
+                    "is_valid": False,
+                    "error": f"SQL appears incomplete; ends with '{ending}'"
+                }
 
         return {
             "is_valid": True,

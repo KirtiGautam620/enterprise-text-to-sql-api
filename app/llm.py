@@ -40,6 +40,8 @@ Rules:
 4. Return SQL only. No explanation.
 5. Prefer simple, readable SQL.
 6. If joins are required, infer joins using similarly named keys such as dept_id, student_id, course_id.
+7. Always complete the SQL query fully.
+8. Always end the SQL query with a semicolon.
 
 In-context examples:
 
@@ -137,7 +139,7 @@ def call_llm(prompt: str) -> Dict[str, Any]:
             }
         ],
         "temperature": 0.1,
-        "max_tokens": 500
+        "max_tokens": 1000
     }
 
     try:

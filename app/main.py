@@ -1,3 +1,4 @@
+from app.database import execute_sql
 from app.validator import validate_sql
 from app.llm import build_sql_prompt, call_llm
 from app.retrieval import retrieve_relevant_tables
@@ -45,6 +46,10 @@ def generate_sql(request: GenerateSQLRequest):
     prompt = build_sql_prompt(question, retrieval_result)
     llm_result = call_llm(prompt)
     validation_result = validate_sql(llm_result["sql"])
+    execution_result = None
+
+    if validation_result["is_valid"]:
+        execution_result = execute_sql(llm_result["sql"])
 
     if not llm_result["success"]:
         raise HTTPException(
@@ -58,7 +63,8 @@ def generate_sql(request: GenerateSQLRequest):
         "is_valid_syntax": validation_result["is_valid"],
         "parsing_errors": validation_result["error"],
         "confidence": retrieval_result["confidence"],
-        "prompt_used": prompt
+        "prompt_used": prompt,
+        "execution_result": execution_result
     }
 
 

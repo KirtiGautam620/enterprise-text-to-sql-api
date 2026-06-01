@@ -25,6 +25,7 @@ class GenerateSQLResponse(BaseModel):
     parsing_errors: Optional[str] = None
     confidence: float
     prompt_used: str
+    execution_result: Optional[Any] = None
 
 
 class BenchmarkResponse(BaseModel):
