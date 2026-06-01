@@ -1,3 +1,5 @@
+from app.llm import build_sql_prompt, call_llm
+from app.retrieval import retrieve_relevant_tables
 from app.retrieval import retrieve_relevant_tables
 from fastapi import FastAPI, HTTPException
 from app.models import (
@@ -38,21 +40,23 @@ def generate_sql(request: GenerateSQLRequest):
     if not question:
         raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-    dummy_sql = (
-        "SELECT d.dept_name, COUNT(e.student_id) AS total_students "
-        "FROM departments d "
-        "JOIN enrollments e ON d.dept_id = e.dept_id "
-        "GROUP BY d.dept_name "
-        "HAVING COUNT(e.student_id) > 100;"
-    )
+    retrieval_result = retrieve_relevant_tables(question)
+    prompt = build_sql_prompt(question, retrieval_result)
+    llm_result = call_llm(prompt)
+
+    if not llm_result["success"]:
+        raise HTTPException(
+            status_code=500,
+            detail=f"LLM generation failed: {llm_result['error']}"
+        )
 
     return {
-        "sql": dummy_sql,
-        "retrieved_tables": ["departments", "enrollments"],
+        "sql": llm_result["sql"],
+        "retrieved_tables": retrieval_result["retrieved_tables"],
         "is_valid_syntax": True,
         "parsing_errors": None,
-        "confidence": 0.85,
-        "prompt_used": "Dummy prompt for initial API skeleton"
+        "confidence": retrieval_result["confidence"],
+        "prompt_used": prompt
     }
 
 

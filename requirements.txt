@@ -6,3 +6,4 @@ sentence-transformers
 scikit-learn
 sqlparse
 requests
+python-dotenv
