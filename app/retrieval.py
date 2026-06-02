@@ -35,6 +35,19 @@ def keyword_boost(question: str, table: Dict[str, Any]) -> float:
     boost = 0.0
 
     table_name = table["table_name"].lower()
+        # Strong boost if table name words appear in question
+    table_words = table_name.replace("_", " ").split()
+    for word in table_words:
+        if len(word) > 3 and word in question_lower:
+            boost += 0.15
+
+    # Penalize historical/backup/all tables slightly unless directly asked
+    noisy_markers = ["hist", "history", "all", "backup", "archive"]
+    if any(marker in table_name for marker in noisy_markers):
+        boost -= 0.35
+        # Boost room-related tables when question asks about rooms
+    if ("room" in question_lower or "rooms" in question_lower) and "room" in table_name:
+        boost += 0.45
 
     # Direct table name match
     if table_name in question_lower:
@@ -55,7 +68,7 @@ def keyword_boost(question: str, table: Dict[str, Any]) -> float:
 
     return boost
 
-def retrieve_relevant_tables(question: str, top_k: int = 3) -> Dict[str, Any]:
+def retrieve_relevant_tables(question: str, top_k: int = 5) -> Dict[str, Any]:
     schema = load_schema()
 
     table_texts = [table_to_text(table) for table in schema]
