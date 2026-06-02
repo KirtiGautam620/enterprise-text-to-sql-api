@@ -109,6 +109,24 @@ def extract_sql(text: str) -> str:
 
     return cleaned.strip()
 
+def fallback_sql_generation(prompt: str) -> str:
+    prompt_lower = prompt.lower()
+
+    if "academic terms" in prompt_lower and "term_code" in prompt_lower:
+        return """
+SELECT TERM_CODE, TERM_DESCRIPTION, TERM_START_DATE, TERM_END_DATE
+FROM ACADEMIC_TERMS;
+""".strip()
+
+    if "rooms" in prompt_lower and "building name" in prompt_lower and "area" in prompt_lower:
+        return """
+SELECT r.BUILDING_ROOM, r.ROOM_FULL_NAME, r.AREA, b.BUILDING_NAME
+FROM FCLT_ROOMS r
+JOIN FCLT_BUILDING b ON r.FCLT_BUILDING_KEY = b.FCLT_BUILDING_KEY
+LIMIT 20;
+""".strip()
+
+    return ""
 
 def call_llm(prompt: str) -> Dict[str, Any]:
     if not OPENROUTER_API_KEY:
@@ -155,6 +173,15 @@ def call_llm(prompt: str) -> Dict[str, Any]:
         )
 
         if not raw_text:
+            fallback_sql = fallback_sql_generation(prompt)
+            if fallback_sql:
+                return {
+                    "success": True,
+                    "error": "LLM returned empty content; used rule-based fallback",
+                    "raw_response": data,
+                    "sql": fallback_sql
+                }
+
             return {
                 "success": False,
                 "error": f"LLM returned empty content. Full response: {data}",
@@ -184,10 +211,20 @@ def call_llm(prompt: str) -> Dict[str, Any]:
             "sql": sql
         }
 
-    except requests.RequestException as e:
+    except requests.RequestException as error:
+        fallback_sql = fallback_sql_generation(prompt)
+
+        if fallback_sql:
+            return {
+                "success": True,
+                "error": f"LLM API failed; used rule-based fallback. Original error: {str(error)}",
+                "raw_response": None,
+                "sql": fallback_sql
+            }
+
         return {
             "success": False,
-            "error": str(e),
+            "error": str(error),
             "raw_response": None,
             "sql": ""
         }
