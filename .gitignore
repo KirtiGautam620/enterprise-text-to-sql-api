@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 .DS_Store
 logs/
+data/beaver_db.zip
+data/beaver_db/
+__MACOSX/
+*.DS_Store
