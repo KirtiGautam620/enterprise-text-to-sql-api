@@ -6,29 +6,41 @@ from app.llm import build_sql_prompt, call_llm
 from app.validator import validate_sql
 from app.database import execute_sql
 
+import json
+from pathlib import Path
 
-BENCHMARK_QUERIES = [
-    {
-        "question": "Show academic terms with their term code, description, start date and end date",
-        "expected_tables": ["ACADEMIC_TERMS"]
-    },
-    {
-        "question": "Show current academic term parameters",
-        "expected_tables": ["ACADEMIC_TERM_PARAMETER"]
-    },
-    {
-        "question": "Show all rooms with room name and room area",
-        "expected_tables": ["FCLT_ROOMS"]
-    },
-    {
-        "question": "Show rooms with building room and organization name",
-        "expected_tables": ["FCLT_ROOMS"]
-    },
-    {
-        "question": "Show building names and number of rooms",
-        "expected_tables": ["FCLT_BUILDING", "FAC_BUILDING"]
-    }
-]
+BENCHMARK_PATH = Path("data/beaver_benchmark.json")
+
+
+def load_benchmark_queries():
+    if not BENCHMARK_PATH.exists():
+        return []
+
+    with open(BENCHMARK_PATH, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+# BENCHMARK_QUERIES = [
+#     {
+#         "question": "Show academic terms with their term code, description, start date and end date",
+#         "expected_tables": ["ACADEMIC_TERMS"]
+#     },
+#     {
+#         "question": "Show current academic term parameters",
+#         "expected_tables": ["ACADEMIC_TERM_PARAMETER"]
+#     },
+#     {
+#         "question": "Show all rooms with room name and room area",
+#         "expected_tables": ["FCLT_ROOMS"]
+#     },
+#     {
+#         "question": "Show rooms with building room and organization name",
+#         "expected_tables": ["FCLT_ROOMS"]
+#     },
+#     {
+#         "question": "Show building names and number of rooms",
+#         "expected_tables": ["FCLT_BUILDING", "FAC_BUILDING"]
+#     }
+# ]
 
 
 def calculate_recall(retrieved: List[str], expected: List[str]) -> float:
@@ -43,7 +55,9 @@ def calculate_recall(retrieved: List[str], expected: List[str]) -> float:
 
 
 def run_benchmark() -> Dict[str, Any]:
-    total_queries = len(BENCHMARK_QUERIES)
+    # total_queries = len(BENCHMARK_QUERIES)
+    benchmark_queries = load_benchmark_queries()
+    total_queries = len(benchmark_queries)
 
     retrieval_scores = []
     parsing_successes = 0
@@ -55,7 +69,7 @@ def run_benchmark() -> Dict[str, Any]:
     execution_failures = 0
     logic_errors = 0
 
-    for item in BENCHMARK_QUERIES:
+    for item in benchmark_queries:
         question = item["question"]
         expected_tables = item["expected_tables"]
 

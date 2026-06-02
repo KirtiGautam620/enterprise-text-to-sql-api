@@ -1,0 +1,111 @@
+[
+  {
+    "id": "dw_real_0",
+    "question": "What is the current building key, building street address, city, state, and postal code of the history department?",
+    "gold_sql": "SELECT DISTINCT d.FCLT_BUILDING_KEY, e.BUILDING_STREET_ADDRESS, d.CITY, d.STATE, d.POSTAL_CODE FROM FCLT_BUILDING_ADDRESS d JOIN FCLT_ROOMS a ON a.FCLT_BUILDING_KEY = d.FCLT_BUILDING_KEY JOIN FCLT_ORG_DLC_KEY b ON a.FCLT_ORGANIZATION_KEY = b.FCLT_ORGANIZATION_KEY JOIN MASTER_DEPT_HIERARCHY c ON b.DLC_KEY = c.DLC_KEY JOIN BUILDINGS e ON e.BUILDING_KEY = d.FCLT_BUILDING_KEY WHERE lower(c.DLC_NAME) = lower('History') AND d.ADDRESS_PURPOSE = 'STREET';",
+    "expected_tables": [
+      "FCLT_BUILDING_ADDRESS",
+      "FCLT_ROOMS",
+      "FCLT_ORG_DLC_KEY",
+      "MASTER_DEPT_HIERARCHY",
+      "BUILDINGS"
+    ]
+  },
+  {
+    "id": "dw_real_1",
+    "question": "Show the unique activity titles, locations, term start date, and supervisor name for all independent activities, sorted by the ascending order of start date.",
+    "gold_sql": "SELECT DISTINCT a.activity_title, d.session_location, c.term_start_date, b.person_name AS Leader FROM iap_subject_detail a JOIN iap_subject_person b ON a.iap_subject_person_key = b.iap_subject_person_key JOIN academic_terms_all c ON c.term_code = a.term_code JOIN iap_subject_session d ON a.iap_subject_session_key = d.iap_subject_session_key WHERE b.person_role = 'Activity leader' ORDER BY term_start_date ASC;",
+    "expected_tables": [
+      "IAP_SUBJECT_DETAIL",
+      "IAP_SUBJECT_PERSON",
+      "ACADEMIC_TERMS_ALL",
+      "IAP_SUBJECT_SESSION"
+    ]
+  },
+  {
+    "id": "dw_real_2",
+    "question": "List the unique course instructor names, course titles, and the amount of material for each course instructor key and the key of subject offered.",
+    "gold_sql": "SELECT DISTINCT LIBRARY_COURSE_INSTRUCTOR.instructor_name, LIBRARY_SUBJECT_OFFERED.subject_title, COUNT(LIBRARY_RESERVE_CATALOG.catalog_isbn) OVER (PARTITION BY LIBRARY_COURSE_INSTRUCTOR.LIBRARY_COURSE_INSTRUCTOR_KEY, LIBRARY_SUBJECT_OFFERED.LIBRARY_SUBJECT_OFFERED_KEY) FROM LIBRARY_COURSE_INSTRUCTOR JOIN LIBRARY_RESERVE_MATRL_DETAIL ON LIBRARY_COURSE_INSTRUCTOR.LIBRARY_COURSE_INSTRUCTOR_KEY = LIBRARY_RESERVE_MATRL_DETAIL.LIBRARY_COURSE_INSTRUCTOR_KEY JOIN LIBRARY_SUBJECT_OFFERED ON LIBRARY_SUBJECT_OFFERED.LIBRARY_SUBJECT_OFFERED_KEY = LIBRARY_RESERVE_MATRL_DETAIL.LIBRARY_SUBJECT_OFFERED_KEY JOIN LIBRARY_RESERVE_CATALOG ON LIBRARY_RESERVE_CATALOG.LIBRARY_RESERVE_CATALOG_KEY = LIBRARY_RESERVE_MATRL_DETAIL.LIBRARY_RESERVE_CATALOG_KEY;",
+    "expected_tables": [
+      "LIBRARY_COURSE_INSTRUCTOR",
+      "LIBRARY_RESERVE_MATRL_DETAIL",
+      "LIBRARY_SUBJECT_OFFERED",
+      "LIBRARY_RESERVE_CATALOG"
+    ]
+  },
+  {
+    "id": "dw_real_3",
+    "question": "What is the room, floor, building key, building street address, city, state, and postal code of Professor Summer Haynes's office?",
+    "gold_sql": "SELECT DISTINCT fac_rooms.Room, fac_rooms.floor, fac_building_address.BUILDING_KEY, BUILDINGS.BUILDING_STREET_ADDRESS, fac_building_address.CITY, fac_building_address.STATE, fac_building_address.POSTAL_CODE FROM (SELECT office_location FROM employee_directory WHERE full_name = 'Haynes, Summer') AS emp_office JOIN fac_rooms ON emp_office.office_location = fac_rooms.fac_room_key JOIN fac_building_address ON fac_rooms.building_key = fac_building_address.BUILDING_KEY JOIN BUILDINGS ON BUILDINGS.BUILDING_KEY = fac_building_address.BUILDING_KEY WHERE fac_building_address.ADDRESS_PURPOSE = 'STREET';",
+    "expected_tables": [
+      "EMPLOYEE_DIRECTORY",
+      "FAC_ROOMS",
+      "FAC_BUILDING_ADDRESS",
+      "BUILDINGS"
+    ]
+  },
+  {
+    "id": "dw_real_4",
+    "question": "List the unique full room names, their corresponding building names, street addresses, cities, states, postal codes, and building heights for rooms associated with subjects that Computer Science students can enroll in.",
+    "gold_sql": "SELECT DISTINCT fr.ROOM_FULL_NAME, b.BUILDING_NAME, b.BUILDING_STREET_ADDRESS, fba.CITY, fba.STATE, fba.POSTAL_CODE, fb.BUILDING_HEIGHT FROM COURSE_CATALOG_SUBJECT_OFFERED JOIN FCLT_ROOMS fr ON MEET_PLACE = FCLT_ROOM_KEY JOIN FCLT_BUILDING_ADDRESS fba ON fba.FCLT_BUILDING_KEY = fr.FCLT_BUILDING_KEY JOIN FCLT_BUILDING fb ON fb.FCLT_BUILDING_KEY = fr.FCLT_BUILDING_KEY JOIN BUILDINGS b ON b.BUILDING_KEY = fr.FCLT_BUILDING_KEY WHERE DEPARTMENT_NAME = 'Electrical Eng & Computer Sci' AND fba.ADDRESS_PURPOSE = 'STREET';",
+    "expected_tables": [
+      "COURSE_CATALOG_SUBJECT_OFFERED",
+      "FCLT_ROOMS",
+      "FCLT_BUILDING_ADDRESS",
+      "FCLT_BUILDING",
+      "BUILDINGS"
+    ]
+  },
+  {
+    "id": "dw_real_5",
+    "question": "List the unique term code, subject title, room, floor, building key, building street address, city, state, and postal code, formats, and number of enrolled students for all courses with more than 300 attendees.",
+    "gold_sql": "SELECT DISTINCT s.TERM_CODE, s.subject_title, fr.room, fr.floor, b.BUILDING_KEY, b.BUILDING_STREET_ADDRESS, fba.CITY, fba.STATE, fba.POSTAL_CODE, s.form_type, s.num_enrolled_students FROM subject_offered s JOIN FCLT_ROOMS fr ON MEET_PLACE = FCLT_ROOM_KEY JOIN FCLT_BUILDING_ADDRESS fba ON fba.FCLT_BUILDING_KEY = fr.FCLT_BUILDING_KEY JOIN BUILDINGS b ON fr.FCLT_BUILDING_KEY = b.BUILDING_KEY WHERE s.num_enrolled_students > 300 AND fba.ADDRESS_PURPOSE = 'STREET';",
+    "expected_tables": [
+      "SUBJECT_OFFERED",
+      "FCLT_ROOMS",
+      "FCLT_BUILDING_ADDRESS",
+      "BUILDINGS"
+    ]
+  },
+  {
+    "id": "dw_real_6",
+    "question": "What are the subject titles, their material titles, ISBN numbers, and total costs of new materials for each subject title?",
+    "gold_sql": "SELECT DISTINCT tso.SUBJECT_TITLE, tm.title, tm.isbn, SUM(tm.new_shelf_price) OVER(PARTITION BY tso.SUBJECT_TITLE) FROM tip_material tm JOIN TIP_DETAIL td ON tm.TIP_MATERIAL_KEY = td.TIP_MATERIAL_KEY JOIN TIP_SUBJECT_OFFERED tso ON tso.SUBJECT_ID = td.SUBJECT_ID;",
+    "expected_tables": [
+      "TIP_MATERIAL",
+      "TIP_DETAIL",
+      "TIP_SUBJECT_OFFERED"
+    ]
+  },
+  {
+    "id": "dw_real_7",
+    "question": "List the long names of buildings constructed before 1950 that have more than 100 employees, the built year of the building, and number of employees.",
+    "gold_sql": "SELECT * FROM (SELECT DISTINCT a.BUILDING_NAME_LONG, a.year_built, COUNT(employee_directory.MIT_ID) OVER (PARTITION BY a.BUILDING_NAME_LONG, a.year_built) AS num_employees FROM (SELECT * FROM (SELECT DISTINCT FCLT_BUILDING_KEY, BUILDING_NAME_LONG, EXTRACT(YEAR FROM STR_TO_DATE(date_built, '%m/%d/%Y')) AS year_built FROM fclt_building_hist) AS sub1 WHERE year_built < 1950) AS a JOIN fclt_rooms ON fclt_rooms.FCLT_BUILDING_KEY = a.FCLT_BUILDING_KEY JOIN (SELECT DISTINCT MIT_ID, OFFICE_LOCATION FROM employee_directory) AS employee_directory ON employee_directory.OFFICE_LOCATION = fclt_rooms.BUILDING_ROOM) AS sub2 WHERE num_employees > 100;",
+    "expected_tables": [
+      "FCLT_BUILDING_HIST",
+      "FCLT_ROOMS",
+      "EMPLOYEE_DIRECTORY"
+    ]
+  },
+  {
+    "id": "dw_real_8",
+    "question": "For each building key, what is the building name and the number of courses offered by the Center for International Studies?",
+    "gold_sql": "SELECT fb.BUILDING_NAME, COUNT(DISTINCT ccc.subject_id) FROM cis_course_catalog ccc JOIN COURSE_CATALOG_SUBJECT_OFFERED ccso ON ccc.SUBJECT_ID = ccso.SUBJECT_ID JOIN FCLT_ROOMS fr ON ccso.MEET_PLACE = fr.FCLT_ROOM_KEY JOIN FCLT_BUILDING fb ON fb.FCLT_BUILDING_KEY = fr.FCLT_BUILDING_KEY GROUP BY fb.FCLT_BUILDING_KEY, fb.BUILDING_NAME;",
+    "expected_tables": [
+      "CIS_COURSE_CATALOG",
+      "COURSE_CATALOG_SUBJECT_OFFERED",
+      "FCLT_ROOMS",
+      "FCLT_BUILDING"
+    ]
+  },
+  {
+    "id": "dw_real_9",
+    "question": "What is the name of the building that accomodates the most students, and how many students does it accomodate?",
+    "gold_sql": "SELECT DISTINCT building_name, num_students FROM (SELECT fclt_building_key, COUNT(full_name) AS num_students FROM fclt_rooms JOIN mit_student_directory ON office_location = BUILDING_ROOM GROUP BY fclt_building_key) AS a JOIN fclt_building ON a.fclt_building_key = fclt_building.fclt_building_key JOIN (SELECT MAX(num_students) AS max_num_students FROM (SELECT fclt_building_key, COUNT(full_name) AS num_students FROM fclt_rooms JOIN mit_student_directory ON office_location = BUILDING_ROOM GROUP BY fclt_building_key) AS subquery1) AS b ON a.num_students = b.max_num_students;",
+    "expected_tables": [
+      "FCLT_ROOMS",
+      "MIT_STUDENT_DIRECTORY",
+      "FCLT_BUILDING"
+    ]
+  }
+]
