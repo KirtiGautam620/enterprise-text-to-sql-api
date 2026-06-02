@@ -1,6 +1,6 @@
 import sqlparse
 from typing import Dict, Any
-
+# Allows only SELECT/WITH queries and blocks destructive SQL operations.
 
 def validate_sql(sql: str) -> Dict[str, Any]:
     if not sql or not sql.strip():

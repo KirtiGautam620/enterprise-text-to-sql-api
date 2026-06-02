@@ -2,7 +2,7 @@ import sqlite3
 from pathlib import Path
 from typing import Dict, Any
 
-
+# Executes validated SQL on the local Beaver SQLite subset.
 DB_PATH = Path("data/beaver_sample.db")
 
 

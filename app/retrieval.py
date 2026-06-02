@@ -5,7 +5,8 @@ from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-
+# Converts each table schema into text and compares it with the user question
+# using embeddings and cosine similarity.
 SCHEMA_PATH = Path("data/schema.json")
 
 model = SentenceTransformer("all-MiniLM-L6-v2")

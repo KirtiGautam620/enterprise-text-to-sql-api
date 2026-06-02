@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 from typing import Dict, Any, List
 
 load_dotenv()
-
+# Builds a prompt with retrieved Beaver schema context and asks the LLM
+# to generate SQLite-compatible SQL.
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemini-2.0-flash-001")

@@ -8,7 +8,7 @@ from app.database import execute_sql
 
 import json
 from pathlib import Path
-
+# Runs a small benchmark using official Beaver query examples.
 BENCHMARK_PATH = Path("data/beaver_benchmark.json")
 
 
