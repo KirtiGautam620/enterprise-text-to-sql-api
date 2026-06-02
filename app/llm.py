@@ -46,41 +46,27 @@ Rules:
 In-context examples:
 
 Example 1:
-Question: Which departments have more than 100 students?
-Schema:
-Table: departments
-Columns: dept_id, dept_name, school_name
+Question: Show academic terms with their term code, description, start date and end date.
 
-Table: enrollments
-Columns: enrollment_id, student_id, course_id, dept_id
+Schema:
+Table: ACADEMIC_TERMS
+Columns: TERM_CODE, TERM_DESCRIPTION, TERM_START_DATE, TERM_END_DATE
 
 SQL:
-SELECT d.dept_name, COUNT(e.student_id) AS total_students
-FROM departments d
-JOIN enrollments e ON d.dept_id = e.dept_id
-GROUP BY d.dept_name
-HAVING COUNT(e.student_id) > 100;
+SELECT TERM_CODE, TERM_DESCRIPTION, TERM_START_DATE, TERM_END_DATE
+FROM ACADEMIC_TERMS;
 
 Example 2:
-Question: Show departments ranked by total enrollment excluding online courses.
+Question: Show all rooms with room name and room area.
+
 Schema:
-Table: departments
-Columns: dept_id, dept_name, school_name
-
-Table: enrollments
-Columns: enrollment_id, student_id, course_id, dept_id
-
-Table: courses
-Columns: course_id, course_name, dept_id, is_online
+Table: FCLT_ROOMS
+Columns: FCLT_ROOM_KEY, BUILDING_ROOM, ROOM_FULL_NAME, AREA
 
 SQL:
-SELECT d.dept_name, COUNT(e.student_id) AS total_enrollment
-FROM departments d
-JOIN enrollments e ON d.dept_id = e.dept_id
-JOIN courses c ON e.course_id = c.course_id
-WHERE c.is_online = 0
-GROUP BY d.dept_name
-ORDER BY total_enrollment DESC;
+SELECT FCLT_ROOM_KEY, BUILDING_ROOM, ROOM_FULL_NAME, AREA
+FROM FCLT_ROOMS
+LIMIT 20;
 
 Now generate SQL for the user question.
 

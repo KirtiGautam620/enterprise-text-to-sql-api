@@ -9,24 +9,24 @@ from app.database import execute_sql
 
 BENCHMARK_QUERIES = [
     {
-        "question": "Show departments ranked by total enrollment excluding online courses",
-        "expected_tables": ["departments", "enrollments", "courses"]
+        "question": "Show academic terms with their term code, description, start date and end date",
+        "expected_tables": ["ACADEMIC_TERMS"]
     },
     {
-        "question": "Which departments have more than 100 students?",
-        "expected_tables": ["departments", "enrollments"]
+        "question": "Show current academic term parameters",
+        "expected_tables": ["ACADEMIC_TERM_PARAMETER"]
     },
     {
-        "question": "List all offline courses with their department names",
-        "expected_tables": ["courses", "departments"]
+        "question": "Show all rooms with room name and room area",
+        "expected_tables": ["FCLT_ROOMS"]
     },
     {
-        "question": "Show students and the courses they are enrolled in",
-        "expected_tables": ["students", "enrollments", "courses"]
+        "question": "Show rooms with building room and organization name",
+        "expected_tables": ["FCLT_ROOMS"]
     },
     {
-        "question": "Find classrooms with capacity greater than 50",
-        "expected_tables": ["classrooms"]
+        "question": "Show building names and number of rooms",
+        "expected_tables": ["FCLT_BUILDING", "FAC_BUILDING"]
     }
 ]
 
