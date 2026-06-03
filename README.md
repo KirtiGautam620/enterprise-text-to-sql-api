@@ -224,7 +224,7 @@ The response includes:
 ```http
 POST /benchmark
 ```
-
+Due to the 48-hour time limit, I used a small Beaver benchmark sample from beaver-query to demonstrate the metrics pipeline.
 This endpoint runs evaluation on a small Beaver query sample.
 
 It returns metrics like:
